@@ -12,6 +12,8 @@ use Contao\Message;
 use HeimrichHannot\RequestBundle\Component\HttpFoundation\Request;
 use HeimrichHannot\UtilsBundle\Container\ContainerUtil;
 use HeimrichHannot\UtilsBundle\String\StringUtil;
+use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class LoadDataContainerListener
@@ -30,17 +32,26 @@ class LoadDataContainerListener
      * @var StringUtil
      */
     private $stringUtil;
+    /**
+     * @var Container
+     */
+    private $container;
 
-    public function __construct(TranslatorInterface $translator, ContainerUtil $containerUtil, Request $request, StringUtil $stringUtil)
+    public function __construct(ContainerInterface $container, TranslatorInterface $translator, ContainerUtil $containerUtil, Request $request, StringUtil $stringUtil)
     {
         $this->translator = $translator;
         $this->containerUtil = $containerUtil;
         $this->request = $request;
         $this->stringUtil = $stringUtil;
+        $this->container = $container;
     }
 
     public function __invoke($table)
     {
+        if (!$this->containerUtil->isBackend()) {
+            return;
+        }
+
         // only run once
         if (static::$run) {
             return;
@@ -57,14 +68,29 @@ class LoadDataContainerListener
             return;
         }
 
+        $types = [];
+        $config = $this->container->getParameter('huh_alert_reminder');
+
+        if (!isset($config['alert_types']) || !\is_array($config['alert_types'])) {
+            return;
+        }
+
+        $allowedTypes = array_map(function ($type) {
+            return $type['name'];
+        }, $config['alert_types']);
+
         foreach ($GLOBALS['TL_HOOKS']['getSystemMessages'] as $callback) {
             $message = \System::importStatic($callback[0])->{$callback[1]}();
 
-            if ($this->stringUtil->startsWith($message, '<div class="alert-reminder">')) {
-                Message::addError($this->translator->trans('huh.alert_reminder.message.issues_existing'));
-
-                return;
+            if (preg_match('@<div class="alert-reminder" data-type="(?P<type>[^"]+)">@i', $message, $matches) && isset($matches['type']) && \in_array($matches['type'], $allowedTypes)) {
+                $types[] = $this->translator->trans('huh.alert_reminder.alert.type.'.$matches['type']);
             }
+        }
+
+        if (\count($types) > 0) {
+            Message::addError($this->translator->trans('huh.alert_reminder.message.issues_existing', [
+                '%issues%' => implode(', ', $types),
+            ]));
         }
     }
 }

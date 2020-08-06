@@ -8,8 +8,13 @@
 
 namespace HeimrichHannot\AlertReminderBundle;
 
+use HeimrichHannot\AlertReminderBundle\DependencyInjection\HeimrichHannotAlertReminderExtension;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 class HeimrichHannotAlertReminderBundle extends Bundle
 {
+    public function getContainerExtension()
+    {
+        return new HeimrichHannotAlertReminderExtension();
+    }
 }
