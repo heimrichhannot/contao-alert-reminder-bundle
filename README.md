@@ -81,3 +81,29 @@ The implementation of this behavior is built into [heimrichhannot/contao-accessi
      alert_types:
        - { name: some_alert_type_alias }
    ```
+
+### Add your alerts to the alert queue backend module
+
+This bundle introduces the `AlertQueueModule`. It's just a list of messages. You might use it to add the full list of
+alerts you want to the user to notice. In the context of reminding the user of missing alt-attributes this is the place
+to add shortcuts to the concrete media files.
+
+You can add your messages by registering an event listener for the event `AddAlertsToAlertReminderQueueEvent` for example as follows:
+
+```php
+public function __invoke(AddAlertsToAlertReminderQueueEvent $event)
+{
+    if ('alt_issues_existing' !== Input::get('type')) {
+        return;
+    }
+
+    $messages = $event->getAlerts();
+
+    $messages[] = [
+        'class' => 'tl_error', // you can use Contao's tl_ classes
+        'message' => 'My message'
+    ];
+
+    $event->setAlerts($messages);
+}
+```
