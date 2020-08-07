@@ -8,11 +8,12 @@
 
 namespace HeimrichHannot\AlertReminderBundle\EventListener;
 
+use Contao\BackendUser;
 use Contao\Message;
 use HeimrichHannot\RequestBundle\Component\HttpFoundation\Request;
 use HeimrichHannot\UtilsBundle\Container\ContainerUtil;
+use HeimrichHannot\UtilsBundle\Dca\DcaUtil;
 use HeimrichHannot\UtilsBundle\String\StringUtil;
-use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -33,17 +34,22 @@ class LoadDataContainerListener
      */
     private $stringUtil;
     /**
-     * @var Container
+     * @var ContainerInterface
      */
     private $container;
+    /**
+     * @var DcaUtil
+     */
+    private $dcaUtil;
 
-    public function __construct(ContainerInterface $container, TranslatorInterface $translator, ContainerUtil $containerUtil, Request $request, StringUtil $stringUtil)
+    public function __construct(ContainerInterface $container, TranslatorInterface $translator, ContainerUtil $containerUtil, Request $request, StringUtil $stringUtil, DcaUtil $dcaUtil)
     {
         $this->translator = $translator;
         $this->containerUtil = $containerUtil;
         $this->request = $request;
         $this->stringUtil = $stringUtil;
         $this->container = $container;
+        $this->dcaUtil = $dcaUtil;
     }
 
     public function __invoke($table)
@@ -59,8 +65,18 @@ class LoadDataContainerListener
 
         static::$run = true;
 
-        // hide for certain backend views
+        // skip for certain backend views
         if (\in_array($this->containerUtil->getCurrentRequest()->get('_route'), ['contao_backend_alerts']) || ('contao_backend' === $this->containerUtil->getCurrentRequest()->get('_route') && ('maintenance' === $this->request->getGet('do')) || (!$this->request->getGet('do')))) {
+            return;
+        }
+
+        // skip in popups
+        if ($this->request->getGet('popup')) {
+            return;
+        }
+
+        // skip in the alert queue
+        if ('alert_queue' === $this->request->getGet('do')) {
             return;
         }
 
@@ -79,17 +95,29 @@ class LoadDataContainerListener
             return $type['name'];
         }, $config['alert_types']);
 
+        $deactivatedAlertReminders = \Contao\StringUtil::deserialize(BackendUser::getInstance()->deactivatedAlertReminders, true);
+
         foreach ($GLOBALS['TL_HOOKS']['getSystemMessages'] as $callback) {
             $message = \System::importStatic($callback[0])->{$callback[1]}();
 
-            if (preg_match('@<div class="alert-reminder" data-type="(?P<type>[^"]+)">@i', $message, $matches) && isset($matches['type']) && \in_array($matches['type'], $allowedTypes)) {
+            if (preg_match('@<div class="alert-reminder" data-type="(?P<type>[^"]+)">@i', $message, $matches) &&
+                isset($matches['type']) && \in_array($matches['type'], $allowedTypes) &&
+                !\in_array($matches['type'], $deactivatedAlertReminders)) {
                 $types[] = $this->translator->trans('huh.alert_reminder.alert.type.'.$matches['type']);
             }
         }
 
+        $alertsLink = $this->dcaUtil->getPopupWizardLink([], [
+                'title' => $this->translator->trans('huh.alert_reminder.message.solve_issue'),
+                'style' => 'float: right;',
+                'route' => 'contao_backend_alerts',
+            ]
+        );
+
         if (\count($types) > 0) {
             Message::addError($this->translator->trans('huh.alert_reminder.message.issues_existing', [
                 '%issues%' => implode(', ', $types),
+                '%alertsLink%' => $alertsLink,
             ]));
         }
     }

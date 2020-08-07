@@ -1,0 +1,7 @@
+<div class="alert-reminder-queue">
+    <?php foreach ($this->alerts as $alert): ?>
+        <div class="alert tl_message" style="margin-bottom: 3px;">
+            <p class="<?= $alert['class'] ?>"><?= $alert['message'] ?></p>
+        </div>
+    <?php endforeach; ?>
+</div>
