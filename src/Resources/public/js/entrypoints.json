@@ -1,0 +1,12 @@
+{
+  "entrypoints": {
+    "contao-alert-reminder-bundle": {
+      "css": [
+        "/public/js/contao-alert-reminder-bundle.css"
+      ],
+      "js": [
+        "/public/js/contao-alert-reminder-bundle.js"
+      ]
+    }
+  }
+}

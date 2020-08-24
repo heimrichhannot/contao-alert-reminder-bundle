@@ -65,6 +65,17 @@ class LoadDataContainerListener
 
         static::$run = true;
 
+        $this->initAssets();
+        $this->initAlerts();
+    }
+
+    public function initAssets()
+    {
+        $GLOBALS['TL_CSS']['contao-alert-reminder-bundle'] = 'bundles/heimrichhannotalertreminder/js/contao-alert-reminder-bundle.css';
+    }
+
+    public function initAlerts()
+    {
         // skip for certain backend views
         if (\in_array($this->containerUtil->getCurrentRequest()->get('_route'), ['contao_backend_alerts']) || ('contao_backend' === $this->containerUtil->getCurrentRequest()->get('_route') && ('maintenance' === $this->request->getGet('do')) || (!$this->request->getGet('do')))) {
             return;

@@ -1,0 +1,14 @@
+{
+  "name": "contao-alert-reminder-bundle",
+  "version": "1.0.0",
+  "dependencies": {
+  },
+  "devDependencies": {
+    "@symfony/webpack-encore": "^0.30",
+    "sass-loader": "^8.0"
+  },
+  "scripts": {
+    "build-dev": "yarn encore dev",
+    "build-production": "yarn encore production"
+  }
+}
