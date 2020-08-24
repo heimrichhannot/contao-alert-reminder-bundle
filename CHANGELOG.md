@@ -1,9 +1,13 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [0.2.3] - 2020-08-24
+
+- fixed css for hiding be module
+
 ## [0.2.2] - 2020-08-24
 
-- added css for hiding be entity
+- added css for hiding be module
 
 ## [0.2.1] - 2020-08-07
 

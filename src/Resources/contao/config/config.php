@@ -10,6 +10,6 @@ $GLOBALS['TL_HOOKS']['loadDataContainer']['huhAccessibility'] = [
 /**
  * Backend modules
  */
-$GLOBALS['BE_MOD']['alert_reminder']['alert_queue'] = [
+$GLOBALS['BE_MOD']['content']['alert_queue'] = [
     'callback' => 'HeimrichHannot\AlertReminderBundle\BackendModule\AlertQueueModule',
 ];

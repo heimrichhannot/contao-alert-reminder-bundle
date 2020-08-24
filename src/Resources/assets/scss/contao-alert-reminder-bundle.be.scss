@@ -1,5 +1,5 @@
 #tl_navigation {
-  .group-alert_reminder, #alert_reminder {
-    display: none;
+  .navigation.alert_queue {
+    display: none !important;
   }
 }
