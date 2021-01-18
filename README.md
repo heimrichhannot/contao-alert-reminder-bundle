@@ -16,8 +16,6 @@ Without the functionality, the user might forget about it. Making the `alt` mand
 
 Hence the need for reminding the backend user of it.
 
-The implementation of this behavior is built into [heimrichhannot/contao-accessibility-bundle](https://github.com/heimrichhannot/contao-accessibility-bundle) which uses this bundle.
-
 ## Installation
 
 1. Run `composer require heimrichhannot/contao-alert-reminder-bundle` and update the database.
