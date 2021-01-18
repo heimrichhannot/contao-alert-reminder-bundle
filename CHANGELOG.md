@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [0.2.4] - 2021-01-18
+
+- fixed readme
+
 ## [0.2.3] - 2020-08-24
 
 - fixed css for hiding be module
