@@ -21,7 +21,7 @@
         "issues": "https://github.com/heimrichhannot/contao-alert-reminder-bundle/issues"
     },
     "require": {
-        "php": "^7.2",
+        "php": "^7.2|^8.0",
         "contao/core-bundle": "^4.4",
         "heimrichhannot/contao-utils-bundle": "^2.173"
     },

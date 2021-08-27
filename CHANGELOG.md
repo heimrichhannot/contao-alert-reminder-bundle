@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [0.2.5] - 2021-08-27
+
+- Added: php8 support
+
 ## [0.2.4] - 2021-01-18
 
 - fixed readme
