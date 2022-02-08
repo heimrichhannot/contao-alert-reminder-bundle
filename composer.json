@@ -21,9 +21,15 @@
         "issues": "https://github.com/heimrichhannot/contao-alert-reminder-bundle/issues"
     },
     "require": {
-        "php": "^7.2|^8.0",
-        "contao/core-bundle": "^4.4",
-        "heimrichhannot/contao-utils-bundle": "^2.173"
+        "php": "^7.2||^8.0",
+        "contao/core-bundle": "^4.9",
+        "heimrichhannot/contao-utils-bundle": "^2.173",
+        "symfony/http-kernel": "^4.4||^5.4",
+        "symfony/config": "^4.4||^5.4",
+        "symfony/dependency-injection": "^4.4||^5.4",
+        "symfony/event-dispatcher": "^4.4||^5.4",
+        "symfony/event-dispatcher-contracts": "^1||^2||^3",
+        "symfony/translation": "^4.4||^5.4"
     },
     "require-dev": {
         "contao/test-case": "1.1.*",

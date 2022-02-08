@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (c) 2020 Heimrich & Hannot GmbH
+ * Copyright (c) 2022 Heimrich & Hannot GmbH
  *
  * @license LGPL-3.0-or-later
  */
@@ -25,7 +25,10 @@ class AlertQueueModule extends BackendModule
     {
         $eventDispatcher = System::getContainer()->get('event_dispatcher');
 
-        $event = $eventDispatcher->dispatch(AddAlertsToAlertReminderQueueEvent::NAME, new AddAlertsToAlertReminderQueueEvent([]));
+        $event = $eventDispatcher->dispatch(
+            new AddAlertsToAlertReminderQueueEvent([]),
+            AddAlertsToAlertReminderQueueEvent::NAME
+        );
 
         $this->Template->alerts = $event->getAlerts();
     }
