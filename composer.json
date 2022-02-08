@@ -66,8 +66,5 @@
     },
     "extra": {
         "contao-manager-plugin": "HeimrichHannot\\AlertReminderBundle\\ContaoManager\\Plugin"
-    },
-    "replace": {
-        "heimrichhannot/contao-alert-reminder-bundle": "self.version"
     }
 }

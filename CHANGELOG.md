@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [0.3.1] - 2022-02-08
+
+- Fixed: `replace` tag in composer.json
+
 ## [0.3.0] - 2022-02-08
 
 - Changed: minimum contao version is now 4.9
