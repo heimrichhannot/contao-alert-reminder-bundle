@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [0.3.2] - 2022-02-08
+
+- Fixed: translator injection
+
 ## [0.3.1] - 2022-02-08
 
 - Fixed: `replace` tag in composer.json

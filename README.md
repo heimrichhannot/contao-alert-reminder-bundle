@@ -40,7 +40,7 @@ Hence the need for reminding the backend user of it.
    
    use Acme\AlertReminderBundle\Manager\AlertReminderManager;
    use Acme\RequestBundle\Component\HttpFoundation\Request;
-   use Symfony\Component\Translation\TranslatorInterface;
+   use Symfony\Contracts\Translation\TranslatorInterface;
    
    class GetSystemMessagesListener
    {
