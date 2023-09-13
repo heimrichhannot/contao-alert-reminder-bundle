@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [0.3.3] - 2023-09-13
+- Fixed: exceptions to dependency on request bundle
+- Fixed: some deprecation warnings
+
 ## [0.3.2] - 2022-02-08
 
 - Fixed: translator injection
