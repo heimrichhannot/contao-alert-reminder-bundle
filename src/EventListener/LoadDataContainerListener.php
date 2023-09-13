@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (c) 2022 Heimrich & Hannot GmbH
+ * Copyright (c) 2023 Heimrich & Hannot GmbH
  *
  * @license LGPL-3.0-or-later
  */
@@ -9,52 +9,44 @@
 namespace HeimrichHannot\AlertReminderBundle\EventListener;
 
 use Contao\BackendUser;
+use Contao\CoreBundle\ServiceAnnotation\Hook;
 use Contao\Message;
-use HeimrichHannot\RequestBundle\Component\HttpFoundation\Request;
-use HeimrichHannot\UtilsBundle\Container\ContainerUtil;
+use Contao\StringUtil;
+use Contao\System;
 use HeimrichHannot\UtilsBundle\Dca\DcaUtil;
-use HeimrichHannot\UtilsBundle\String\StringUtil;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use HeimrichHannot\UtilsBundle\Util\Utils;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * @Hook("loadDataContainer")
+ */
 class LoadDataContainerListener
 {
-    private static $run = false;
+    private static bool $run = false;
 
-    /**
-     * @var ContainerUtil
-     */
-    private $containerUtil;
-    /**
-     * @var Request
-     */
-    private $request;
-    /**
-     * @var StringUtil
-     */
-    private $stringUtil;
-    /**
-     * @var ContainerInterface
-     */
-    private $container;
-    /**
-     * @var DcaUtil
-     */
-    private $dcaUtil;
+    private DcaUtil $dcaUtil;
+    private Utils $utils;
+    private RequestStack $requestStack;
+    private ParameterBagInterface $parameterBag;
+    private TranslatorInterface $translator;
 
-    public function __construct(ContainerInterface $container, TranslatorInterface $translator, ContainerUtil $containerUtil, Request $request, StringUtil $stringUtil, DcaUtil $dcaUtil)
+    public function __construct(Utils $utils, RequestStack $requestStack, ParameterBagInterface $parameterBag, TranslatorInterface $translator, DcaUtil $dcaUtil)
     {
         $this->translator = $translator;
-        $this->containerUtil = $containerUtil;
-        $this->request = $request;
-        $this->stringUtil = $stringUtil;
-        $this->container = $container;
         $this->dcaUtil = $dcaUtil;
+        $this->utils = $utils;
+        $this->requestStack = $requestStack;
+        $this->parameterBag = $parameterBag;
     }
 
-    public function __invoke($table)
+    public function __invoke(string $table): void
     {
-        if (!$this->containerUtil->isBackend()) {
+        $request = $this->requestStack->getCurrentRequest();
+
+        if (!$this->utils->container()->isBackend()) {
             return;
         }
 
@@ -66,28 +58,31 @@ class LoadDataContainerListener
         static::$run = true;
 
         $this->initAssets();
-        $this->initAlerts();
+        $this->initAlerts($request);
     }
 
-    public function initAssets()
+    protected function initAssets()
     {
         $GLOBALS['TL_CSS']['contao-alert-reminder-bundle'] = 'bundles/heimrichhannotalertreminder/js/contao-alert-reminder-bundle.css';
     }
 
-    public function initAlerts()
+    protected function initAlerts(Request $request)
     {
         // skip for certain backend views
-        if (\in_array($this->containerUtil->getCurrentRequest()->get('_route'), ['contao_backend_alerts']) || ('contao_backend' === $this->containerUtil->getCurrentRequest()->get('_route') && ('maintenance' === $this->request->getGet('do')) || (!$this->request->getGet('do')))) {
+        if (\in_array($request->get('_route'), ['contao_backend_alerts'])
+            || ('contao_backend' === $request->get('_route') && ('maintenance' === $request->query->get('do'))
+                || (!$request->query->has('do'))
+            )) {
             return;
         }
 
         // skip in popups
-        if ($this->request->getGet('popup')) {
+        if ($request->query->has('popup')) {
             return;
         }
 
         // skip in the alert queue
-        if ('alert_queue' === $this->request->getGet('do')) {
+        if ('alert_queue' === $request->query->get('do')) {
             return;
         }
 
@@ -96,7 +91,7 @@ class LoadDataContainerListener
         }
 
         $types = [];
-        $config = $this->container->getParameter('huh_alert_reminder');
+        $config = $this->parameterBag->get('huh_alert_reminder');
 
         if (!isset($config['alert_types']) || !\is_array($config['alert_types'])) {
             return;
@@ -106,10 +101,10 @@ class LoadDataContainerListener
             return $type['name'];
         }, $config['alert_types']);
 
-        $deactivatedAlertReminders = \Contao\StringUtil::deserialize(BackendUser::getInstance()->deactivatedAlertReminders, true);
+        $deactivatedAlertReminders = StringUtil::deserialize(BackendUser::getInstance()->deactivatedAlertReminders, true);
 
         foreach ($GLOBALS['TL_HOOKS']['getSystemMessages'] as $callback) {
-            $message = \System::importStatic($callback[0])->{$callback[1]}();
+            $message = System::importStatic($callback[0])->{$callback[1]}();
 
             if (preg_match('@<div class="alert-reminder" data-type="(?P<type>[^"]+)">@i', $message, $matches) &&
                 isset($matches['type']) && \in_array($matches['type'], $allowedTypes) &&

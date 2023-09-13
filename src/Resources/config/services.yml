@@ -3,5 +3,6 @@ services:
     public: true
     autowire: true
 
-  HeimrichHannot\AlertReminderBundle\Manager\:
-    resource: '../../Manager/*'
+  HeimrichHannot\AlertReminderBundle\:
+    resource: '../../{EventListener,Manager}/*'
+    autoconfigure: true

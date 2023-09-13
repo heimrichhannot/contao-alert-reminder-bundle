@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (c) 2020 Heimrich & Hannot GmbH
+ * Copyright (c) 2023 Heimrich & Hannot GmbH
  *
  * @license LGPL-3.0-or-later
  */
@@ -24,7 +24,7 @@ class Plugin implements BundlePluginInterface, ConfigPluginInterface
      *
      * @return ConfigInterface[]
      */
-    public function getBundles(ParserInterface $parser)
+    public function getBundles(ParserInterface $parser): array
     {
         $loadAfter = [
             ContaoCoreBundle::class,
@@ -40,6 +40,5 @@ class Plugin implements BundlePluginInterface, ConfigPluginInterface
     {
         $loader->load('@HeimrichHannotAlertReminderBundle/Resources/config/datacontainers.yml');
         $loader->load('@HeimrichHannotAlertReminderBundle/Resources/config/services.yml');
-        $loader->load('@HeimrichHannotAlertReminderBundle/Resources/config/listeners.yml');
     }
 }
